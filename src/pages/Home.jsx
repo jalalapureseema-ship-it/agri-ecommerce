@@ -38,7 +38,12 @@ function Home() {
           </div>
         </div>
         <div className="hero-image">
-          <div className="farm-circle">🌾</div>
+          <div className="farm-circle">
+            <img
+              src="https://images.unsplash.com/photo-1500937386664-56d1dfef3854?auto=format&fit=crop&w=900&q=80"
+              alt="Agricultural field at harvest"
+            />
+          </div>
         </div>
       </section>
 
