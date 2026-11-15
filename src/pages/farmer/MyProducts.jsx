@@ -1,101 +1,61 @@
-
 import { useState } from "react";
 import { Link } from "react-router-dom";
+import FarmerNav from "../../components/FarmerNav";
+import { categoryName } from "../../data/catalog";
+import { deleteFarmerProduct, getSession, ownProducts } from "../../utils/storage";
 
 function MyProducts() {
-  const [products, setProducts] = useState(
-    JSON.parse(localStorage.getItem("farmerProducts") || "[]")
-  );
+  const session = getSession();
+  const [products, setProducts] = useState(() => ownProducts(session?.email || ""));
 
-  // Delete product
   function deleteProduct(id) {
-    const updatedProducts = products.filter(
-      (product) => product.id !== id
+    const remaining = deleteFarmerProduct(id).filter(
+      (product) => !product.farmerEmail || product.farmerEmail === session?.email
     );
-
-    setProducts(updatedProducts);
-
-    localStorage.setItem(
-      "farmerProducts",
-      JSON.stringify(updatedProducts)
-    );
+    setProducts(remaining);
   }
 
   return (
     <div className="dashboard-page">
-
+      <FarmerNav />
       <h1>📦 My Products</h1>
-
       <p>Manage the agricultural products added by you.</p>
-
-      <Link
-        to="/farmer/add-product"
-        className="login-button"
-      >
-        + Add New Product
-      </Link>
+      <Link to="/farmer/add-product" className="login-button">+ Add New Product</Link>
 
       {products.length === 0 ? (
-
         <div className="empty-products">
           <div>📦</div>
           <h2>No Products Yet</h2>
           <p>Start selling by adding your first product.</p>
         </div>
-
       ) : (
-
         <div className="product-grid">
-
           {products.map((product) => (
-
             <div className="product-card" key={product.id}>
-
               <div className="product-card-image">
-
                 {product.image ? (
-                  <img
-                    src={product.image}
-                    alt={product.name}
-                    style={{
-                      width: "100%",
-                      height: "100%",
-                      objectFit: "cover"
-                    }}
-                  />
+                  <img src={product.image} alt={product.name} />
                 ) : (
-                  "🌾"
+                  product.icon || "🌾"
                 )}
-
               </div>
-
               <h2>{product.name}</h2>
-
-              <p>Category: {product.category}</p>
-
+              <p>Category: {categoryName(product.category)}</p>
               <p>Price: ₹{product.price} / {product.unit}</p>
-
-              <p>
-                Available: {product.quantity} {product.unit}
-              </p>
-
+              <p>Available: {product.quantity} {product.unit}</p>
               <p>Location: {product.location}</p>
-
-              <button
-                className="remove-cart-button"
-                onClick={() => deleteProduct(product.id)}
-              >
-                Delete Product
-              </button>
-
+              <div className="card-actions">
+                <Link to={`/farmer/edit/${product.id}`} className="view-product-button">
+                  Edit
+                </Link>
+                <button type="button" className="remove-cart-button" onClick={() => deleteProduct(product.id)}>
+                  Delete Product
+                </button>
+              </div>
             </div>
-
           ))}
-
         </div>
-
       )}
-
     </div>
   );
 }
