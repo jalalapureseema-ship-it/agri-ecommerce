@@ -13,7 +13,7 @@ import FarmerLogin from "./pages/farmer/FarmerLogin";
 import FarmerRegister from "./pages/farmer/FarmerRegister";
 import FarmerDashboard from "./pages/farmer/FarmerDashboard";
 import AddProduct from "./pages/farmer/AddProduct";
-import MyProducts from "./pages/farmer/MyProducts";
+import MyProducts from "./pages/farmer/Myproducts";
 import FarmerOrders from "./pages/farmer/FarmerOrders";
 
 // ================= CUSTOMER PAGES =================
