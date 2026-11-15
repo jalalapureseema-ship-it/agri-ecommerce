@@ -1,314 +1,132 @@
 import { Link, useNavigate } from "react-router-dom";
 import { useState } from "react";
+import CustomerNav from "../../components/CustomerNav";
+import { cartTotals, getCart, getSession, placeOrder } from "../../utils/storage";
 
 function Checkout() {
   const navigate = useNavigate();
-
-  const [cart] = useState(
-    JSON.parse(localStorage.getItem("cart")) || []
-  );
-
+  const session = getSession();
+  const customer = session?.role === "customer" ? session : null;
+  const [cart] = useState(() => getCart());
+  const [error, setError] = useState("");
   const [formData, setFormData] = useState({
-    name: "",
-    mobile: "",
-    address: "",
+    name: customer?.name || "",
+    mobile: customer?.mobile || "",
+    address: customer?.address || "",
     city: "",
     pincode: "",
     payment: "Cash on Delivery",
   });
+  const totals = cartTotals(cart);
 
-  const total = cart.reduce(
-    (sum, item) => sum + item.price * item.quantity,
-    0
-  );
+  function handleChange(event) {
+    setFormData({ ...formData, [event.target.name]: event.target.value });
+  }
 
-  const handleChange = (e) => {
-    setFormData({
-      ...formData,
-      [e.target.name]: e.target.value,
-    });
-  };
-
-  const handleSubmit = (e) => {
-    e.preventDefault();
-
+  function handleSubmit(event) {
+    event.preventDefault();
     if (cart.length === 0) {
-      alert("Your cart is empty!");
-      navigate("/customer/categories");
+      setError("Your cart is empty.");
+      return;
+    }
+    if (formData.name.trim().length < 2) {
+      setError("Enter the recipient's full name.");
+      return;
+    }
+    if (!/^\d{10}$/.test(formData.mobile)) {
+      setError("Enter a 10-digit mobile number.");
+      return;
+    }
+    if (formData.address.trim().length < 5 || !formData.city.trim()) {
+      setError("Enter a complete delivery address and city.");
+      return;
+    }
+    if (!/^\d{6}$/.test(formData.pincode.trim())) {
+      setError("Enter a 6-digit pincode.");
       return;
     }
 
-    const newOrder = {
-      id: Date.now(),
-      items: cart,
-      customer: formData,
-      total: total,
-      status: "Order Placed",
-      date: new Date().toLocaleDateString(),
-    };
-
-    const existingOrders =
-      JSON.parse(localStorage.getItem("orders")) || [];
-
-    const updatedOrders = [
-      ...existingOrders,
-      newOrder,
-    ];
-
-    localStorage.setItem(
-      "orders",
-      JSON.stringify(updatedOrders)
-    );
-
-    // Clear cart after placing order
-    localStorage.removeItem("cart");
-
-    alert("🎉 Your order has been placed successfully!");
-
-    navigate("/customer/orders");
-  };
+    const result = placeOrder(formData, cart);
+    if (!result.ok) {
+      setError(result.message);
+      return;
+    }
+    navigate(`/customer/order-confirmation/${result.order.id}`);
+  }
 
   return (
     <div className="customer-page">
-
-      {/* ================= NAVBAR ================= */}
-
-      <nav className="customer-navbar">
-
-        <div className="customer-logo">
-          🌾 AgriMart
-        </div>
-
-        <div className="customer-nav-links">
-          <Link to="/customer/home">Home</Link>
-          <Link to="/customer/categories">
-            Categories
-          </Link>
-          <Link to="/customer/cart">
-            🛒 Cart
-          </Link>
-          <Link to="/customer/orders">
-            My Orders
-          </Link>
-        </div>
-
-      </nav>
-
-
-      {/* ================= CHECKOUT ================= */}
-
+      <CustomerNav />
       <section className="customer-section">
-
-        <h1 className="page-title">
-          Checkout
-        </h1>
-
-        <p className="page-description">
-          Enter your delivery details to place your order.
-        </p>
-
+        <h1 className="page-title">Checkout</h1>
+        <p className="page-description">Review the cart and enter delivery details to confirm the order.</p>
 
         {cart.length === 0 ? (
-
           <div className="empty-cart">
-
-            <div className="empty-cart-icon">
-              🛒
-            </div>
-
+            <div className="empty-cart-icon">🛒</div>
             <h2>Your cart is empty</h2>
-
-            <p>
-              Please add products before checkout.
-            </p>
-
-            <Link
-              to="/customer/categories"
-              className="shop-button"
-            >
-              Continue Shopping
-            </Link>
-
+            <p>Please add products before checkout.</p>
+            <Link to="/customer/shop" className="shop-button">Continue Shopping</Link>
           </div>
-
         ) : (
-
           <div className="checkout-container">
-
-            {/* ================= DELIVERY FORM ================= */}
-
             <div className="checkout-form">
-
-              <h2>
-                📦 Delivery Details
-              </h2>
-
+              <h2>📦 Delivery Details</h2>
+              {error && <p className="form-error" role="alert">{error}</p>}
               <form onSubmit={handleSubmit}>
+                <label htmlFor="checkout-name">Full Name</label>
+                <input id="checkout-name" name="name" value={formData.name} onChange={handleChange} placeholder="Enter your full name" required />
 
-                <label>
-                  Full Name
-                </label>
+                <label htmlFor="checkout-mobile">Mobile Number</label>
+                <input id="checkout-mobile" name="mobile" value={formData.mobile} onChange={handleChange} placeholder="Enter mobile number" required />
 
-                <input
-                  type="text"
-                  name="name"
-                  placeholder="Enter your full name"
-                  value={formData.name}
-                  onChange={handleChange}
-                  required
-                />
+                <label htmlFor="checkout-address">Delivery Address</label>
+                <textarea id="checkout-address" name="address" rows="4" value={formData.address} onChange={handleChange} placeholder="Enter your complete address" required />
 
+                <label htmlFor="checkout-city">City</label>
+                <input id="checkout-city" name="city" value={formData.city} onChange={handleChange} placeholder="Enter your city" required />
 
-                <label>
-                  Mobile Number
-                </label>
+                <label htmlFor="checkout-pincode">Pincode</label>
+                <input id="checkout-pincode" name="pincode" value={formData.pincode} onChange={handleChange} placeholder="Enter pincode" required />
 
-                <input
-                  type="tel"
-                  name="mobile"
-                  placeholder="Enter mobile number"
-                  value={formData.mobile}
-                  onChange={handleChange}
-                  required
-                />
-
-
-                <label>
-                  Delivery Address
-                </label>
-
-                <textarea
-                  name="address"
-                  placeholder="Enter your complete address"
-                  rows="4"
-                  value={formData.address}
-                  onChange={handleChange}
-                  required
-                />
-
-
-                <label>
-                  City
-                </label>
-
-                <input
-                  type="text"
-                  name="city"
-                  placeholder="Enter your city"
-                  value={formData.city}
-                  onChange={handleChange}
-                  required
-                />
-
-
-                <label>
-                  Pincode
-                </label>
-
-                <input
-                  type="text"
-                  name="pincode"
-                  placeholder="Enter pincode"
-                  value={formData.pincode}
-                  onChange={handleChange}
-                  required
-                />
-
-
-                <label>
-                  Payment Method
-                </label>
-
-                <select
-                  name="payment"
-                  value={formData.payment}
-                  onChange={handleChange}
-                >
-                  <option value="Cash on Delivery">
-                    Cash on Delivery
-                  </option>
-
-                  <option value="UPI">
-                    UPI
-                  </option>
-
-                  <option value="Card">
-                    Credit / Debit Card
-                  </option>
+                <label htmlFor="checkout-payment">Payment Method</label>
+                <select id="checkout-payment" name="payment" value={formData.payment} onChange={handleChange}>
+                  <option value="Cash on Delivery">Cash on Delivery</option>
                 </select>
+                <p className="payment-note">Online payment is not available in this version.</p>
 
-
-                <button
-                  type="submit"
-                  className="place-order-button"
-                >
-                  Place Order
-                </button>
-
+                <button type="submit" className="place-order-button">Confirm Order</button>
               </form>
-
             </div>
-
-
-            {/* ================= ORDER SUMMARY ================= */}
 
             <div className="checkout-summary">
-
-              <h2>
-                🛒 Order Summary
-              </h2>
-
-
-              {cart.map((item, index) => (
-
-                <div
-                  className="checkout-item"
-                  key={index}
-                >
-
-                  <div className="checkout-item-icon">
-                    {item.icon}
-                  </div>
-
+              <h2>🛒 Order Summary</h2>
+              {cart.map((item) => (
+                <div className="checkout-item" key={item.id}>
+                  <div className="checkout-item-icon">{item.icon || "🌾"}</div>
                   <div>
-                    <h3>
-                      {item.name}
-                    </h3>
-
-                    <p>
-                      Quantity: {item.quantity}
-                    </p>
+                    <h3>{item.name}</h3>
+                    <p>Quantity: {item.quantity}</p>
                   </div>
-
-                  <strong>
-                    ₹{item.price * item.quantity}
-                  </strong>
-
+                  <strong>₹{item.price * item.quantity}</strong>
                 </div>
-
               ))}
-
-
-              <div className="checkout-total">
-
-                <span>
-                  Total Amount
-                </span>
-
-                <strong>
-                  ₹{total}
-                </strong>
-
+              <div className="summary-row">
+                <span>Subtotal</span>
+                <span>₹{totals.subtotal}</span>
               </div>
-
+              <div className="summary-row">
+                <span>Delivery</span>
+                <span>{totals.delivery === 0 ? "Free" : `₹${totals.delivery}`}</span>
+              </div>
+              <div className="checkout-total">
+                <span>Grand total</span>
+                <strong>₹{totals.grand}</strong>
+              </div>
             </div>
-
           </div>
-
         )}
-
       </section>
-
     </div>
   );
 }

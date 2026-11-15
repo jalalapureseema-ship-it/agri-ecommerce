@@ -1,16 +1,31 @@
-# React + Vite
+# AgriMart
 
-This template provides a minimal setup to get React working in Vite with HMR and some ESLint rules.
+AgriMart is a responsive agriculture marketplace built with React, Vite, React Router, and CSS. It includes separate farmer and customer experiences, a categorized sample catalog, product listings, a persistent cart, checkout, order tracking, and contact forms.
 
-Currently, two official plugins are available:
+## Run locally
 
-- [@vitejs/plugin-react](https://github.com/vitejs/vite-plugin-react/blob/main/packages/plugin-react) uses [Oxc](https://oxc.rs)
-- [@vitejs/plugin-react-swc](https://github.com/vitejs/vite-plugin-react/blob/main/packages/plugin-react-swc) uses [SWC](https://swc.rs/)
+```sh
+npm install
+npm run dev
+```
 
-## React Compiler
+Open the local URL printed by Vite. Create a farmer or customer account in the app to try the dashboards and workflows; there are no shared demo passwords.
 
-The React Compiler is not enabled on this template because of its impact on dev & build performances. To add it, see [this documentation](https://react.dev/learn/react-compiler/installation).
+## Validation
 
-## Expanding the ESLint configuration
+```sh
+npm run lint
+npm run build
+```
 
-If you are developing a production application, we recommend using TypeScript with type-aware lint rules enabled. Check out the [TS template](https://github.com/vitejs/vite/tree/main/packages/create-vite/template-react-ts) for information on how to integrate TypeScript and [`typescript-eslint`](https://typescript-eslint.io) in your project.
+## Current data and service limits
+
+This version is a frontend-only prototype. Accounts, product listings, cart contents, orders, and contact messages are saved in the current browser's `localStorage`; they are not shared across browsers or devices. Account passwords are stored locally in plain text, so this storage is not suitable for real accounts or sensitive data. The mobile OTP flow is a local demonstration and does not send SMS. Online payments and a support mailbox are not connected; checkout is limited to cash on delivery, and contact messages remain in the browser.
+
+The built-in products are sample catalog data. Farmer-uploaded images are resized in the browser and stored with their listing, so a production deployment should use a proper image-storage service.
+
+## Public deployment
+
+The Vercel rewrite in `vercel.json` sends deep links to the React app so BrowserRouter routes work on refresh. Deploy the repository as a Vite project with the default build command `npm run build` and output directory `dist`.
+
+A public deployment of the current frontend is suitable for trying the interface, not for operating a real multi-user marketplace. Before handling real customers, orders, passwords, or payments, connect a server/API and database, secure server-side authentication and authorization, persistent image storage, an email/SMS provider, and a payment provider if online payments are required. No backend URL, database URI, provider credentials, or API keys were supplied, so none are included or simulated as live services.

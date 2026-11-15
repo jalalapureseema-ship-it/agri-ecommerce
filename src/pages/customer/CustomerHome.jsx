@@ -1,26 +1,11 @@
 import { Link } from "react-router-dom";
+import CustomerNav from "../../components/CustomerNav";
+import { categories } from "../../data/catalog";
 
 function CustomerHome() {
   return (
     <div className="customer-home">
-
-      {/* ================= NAVBAR ================= */}
-      <nav className="customer-navbar">
-        <div className="customer-logo">
-          🌾 AgriMart
-        </div>
-
-        <div className="customer-nav-links">
-          <Link to="/customer/home">Home</Link>
-          <Link to="/customer/categories">Categories</Link>
-          <Link to="/customer/cart">🛒 Cart</Link>
-          <Link to="/customer/orders">My Orders</Link>
-        </div>
-
-        <Link to="/" className="customer-logout">
-          Logout
-        </Link>
-      </nav>
+      <CustomerNav />
 
 
       {/* ================= HERO SECTION ================= */}
@@ -79,71 +64,18 @@ function CustomerHome() {
         </p>
 
         <div className="category-cards">
-
-          <Link
-            to="/customer/category/crops"
-            className="category-card"
-          >
-            <div className="category-icon">🌾</div>
-            <h3>Crops</h3>
-            <p>Rice, wheat, maize and other crops</p>
-            <span className="view-products">
-              View Products →
-            </span>
-          </Link>
-
-
-          <Link
-            to="/customer/category/fruits"
-            className="category-card"
-          >
-            <div className="category-icon">🍎</div>
-            <h3>Fruits</h3>
-            <p>Fresh fruits directly from farmers</p>
-            <span className="view-products">
-              View Products →
-            </span>
-          </Link>
-
-
-          <Link
-            to="/customer/category/vegetables"
-            className="category-card"
-          >
-            <div className="category-icon">🥕</div>
-            <h3>Vegetables</h3>
-            <p>Fresh farm vegetables</p>
-            <span className="view-products">
-              View Products →
-            </span>
-          </Link>
-
-
-          <Link
-            to="/customer/category/seeds"
-            className="category-card"
-          >
-            <div className="category-icon">🌱</div>
-            <h3>Seeds</h3>
-            <p>Quality seeds for farming</p>
-            <span className="view-products">
-              View Products →
-            </span>
-          </Link>
-
-
-          <Link
-            to="/customer/category/pesticides"
-            className="category-card"
-          >
-            <div className="category-icon">🧪</div>
-            <h3>Pesticides</h3>
-            <p>Products for crop protection</p>
-            <span className="view-products">
-              View Products →
-            </span>
-          </Link>
-
+          {categories.map((category) => (
+            <Link
+              key={category.id}
+              to={`/customer/category/${category.id}`}
+              className="category-card"
+            >
+              <div className="category-icon">{category.icon}</div>
+              <h3>{category.name}</h3>
+              <p>{category.description}</p>
+              <span className="view-products">View Products →</span>
+            </Link>
+          ))}
         </div>
       </section>
 

@@ -1,245 +1,152 @@
+import { Link } from "react-router-dom";
+import { FaHandshake, FaLeaf, FaRupeeSign, FaTractor } from "react-icons/fa";
+import Navbar from "../components/Navbar";
+import Footer from "../components/Footer";
+import ProductCard from "../components/ProductCard";
+import ContactForm from "../components/ContactForm";
+import { categories } from "../data/catalog";
+import { getAllProducts } from "../utils/storage";
+
 function Home() {
+  const featured = categories
+    .map((category) =>
+      getAllProducts().find((product) => product.category === category.id)
+    )
+    .filter(Boolean)
+    .slice(0, 4);
+
   return (
     <div className="home-page">
+      <Navbar />
 
-      {/* Navbar */}
-      <nav className="navbar">
-
-        <div className="logo">
-          🌾 AgriMart
-        </div>
-
-        <div className="nav-links">
-          <a href="#home">Home</a>
-          <a href="#categories">Categories</a>
-          <a href="#about">About</a>
-          <a href="#contact">Contact</a>
-        </div>
-
-        <button className="nav-login">
-          Login
-        </button>
-
-      </nav>
-
-
-      {/* Hero Section */}
       <section className="hero-section" id="home">
-
         <div className="hero-content">
-
-          <p className="small-title">
-            🌱 FARM FRESH • DIRECT FROM FARMERS
-          </p>
-
+          <p className="small-title">🌱 FARM FRESH • DIRECT FROM FARMERS</p>
           <h1>
-            Fresh Products,
+            Connecting Farmers
             <br />
-            <span>Directly From Farmers</span>
+            <span>Directly with Customers</span>
           </h1>
-
           <p className="hero-text">
-            Buy fresh crops, fruits and vegetables directly
-            from farmers and support local agriculture.
+            AgriMart is a marketplace where growers list seeds, crops,
+            produce and tools, and families buy them without a chain of
+            middlemen.
           </p>
-
           <div className="hero-buttons">
-
-            <button className="primary-btn">
-              🛒 Shop Now
-            </button>
-
-            <button className="secondary-btn">
-              👨‍🌾 Sell Your Products
-            </button>
-
+            <Link to="/customer/shop" className="primary-btn">🛒 Shop Now</Link>
+            <Link to="/farmer/register" className="secondary-btn">👨‍🌾 Sell Your Products</Link>
           </div>
-
         </div>
-
-
         <div className="hero-image">
-          <div className="farm-circle">
-            🌾
-          </div>
+          <div className="farm-circle">🌾</div>
         </div>
-
       </section>
 
-
-      {/* Farmer / Customer Section */}
       <section className="user-section">
-
         <h2>Who Are You?</h2>
-
-        <p className="section-description">
-          Choose how you want to use AgriMart
-        </p>
-
-
+        <p className="section-description">Choose how you want to use AgriMart</p>
         <div className="user-cards">
-
-          {/* Farmer */}
           <div className="user-card farmer-card">
-
-            <div className="user-icon">
-              👨‍🌾
-            </div>
-
-            <h3>I'm a Farmer</h3>
-
-            <p>
-              Sell your crops and agricultural products
-              directly to customers.
-            </p>
-
-            <button>
-              Farmer Login →
-            </button>
-
-            <button className="outline-btn">
-              Create Farmer Account
-            </button>
-
+            <div className="user-icon">👨‍🌾</div>
+            <h3>I&apos;m a Farmer</h3>
+            <p>Sell your crops and agricultural products directly to customers.</p>
+            <Link to="/farmer/login">Farmer Login →</Link>
+            <Link to="/farmer/register" className="outline-btn">Create Farmer Account</Link>
           </div>
-
-
-          {/* Customer */}
           <div className="user-card customer-card">
-
-            <div className="user-icon">
-              🛒
-            </div>
-
-            <h3>I'm a Customer</h3>
-
-            <p>
-              Discover fresh crops, fruits and vegetables
-              directly from farmers.
-            </p>
-
-            <button>
-              Customer Login →
-            </button>
-
-            <button className="outline-btn">
-              Create Customer Account
-            </button>
-
+            <div className="user-icon">🛒</div>
+            <h3>I&apos;m a Customer</h3>
+            <p>Discover fresh crops, fruits and vegetables directly from farmers.</p>
+            <Link to="/customer/login">Customer Login →</Link>
+            <Link to="/customer/register" className="outline-btn">Create Customer Account</Link>
           </div>
-
         </div>
-
       </section>
 
-
-      {/* Categories */}
       <section className="categories-section" id="categories">
-
         <h2>Explore Categories</h2>
-
-        <p className="section-description">
-          Fresh products from local farmers
-        </p>
-
-
+        <p className="section-description">Each category lists only its own products</p>
         <div className="category-container">
-
-          <div className="category-card">
-            <div>🌾</div>
-            <h3>Crops</h3>
-            <p>Fresh farm crops</p>
-          </div>
-
-          <div className="category-card">
-            <div>🍎</div>
-            <h3>Fruits</h3>
-            <p>Fresh seasonal fruits</p>
-          </div>
-
-          <div className="category-card">
-            <div>🥕</div>
-            <h3>Vegetables</h3>
-            <p>Healthy vegetables</p>
-          </div>
-
-          <div className="category-card">
-            <div>🌱</div>
-            <h3>Seeds</h3>
-            <p>Quality farming seeds</p>
-          </div>
-
+          {categories.map((category) => (
+            <Link
+              key={category.id}
+              to={`/customer/category/${category.id}`}
+              className="category-card"
+            >
+              <div>{category.icon}</div>
+              <h3>{category.name}</h3>
+              <p>{category.description}</p>
+            </Link>
+          ))}
         </div>
-
       </section>
 
+      <section className="featured-section">
+        <h2>Featured agricultural products</h2>
+        <p className="section-description">A sample from farms already listed on AgriMart</p>
+        <div className="product-grid">
+          {featured.map((product) => (
+            <ProductCard key={product.id} product={product} />
+          ))}
+        </div>
+      </section>
 
-      {/* Features */}
       <section className="features-section" id="about">
-
         <h2>Why Choose AgriMart?</h2>
-
         <div className="features-container">
-
           <div className="feature">
-            <div>🚜</div>
+            <div><FaTractor /></div>
             <h3>Direct From Farmers</h3>
-            <p>
-              Connect directly with farmers and buy
-              fresh agricultural products.
-            </p>
+            <p>Buyers and growers meet on the same listing, with the farmer named on every product.</p>
           </div>
-
-
           <div className="feature">
-            <div>🥬</div>
+            <div><FaLeaf /></div>
             <h3>Fresh Products</h3>
-            <p>
-              Get fresh and quality farm products
-              directly from their source.
-            </p>
+            <p>Grains, fruit, vegetables, seeds and inputs stay in separate categories.</p>
           </div>
-
-
           <div className="feature">
-            <div>💰</div>
+            <div><FaRupeeSign /></div>
             <h3>Fair Prices</h3>
-            <p>
-              Farmers receive better prices while
-              customers get reasonable prices.
-            </p>
+            <p>Farmers set the price. Customers see the total before they confirm an order.</p>
           </div>
-
-
           <div className="feature">
-            <div>🤝</div>
+            <div><FaHandshake /></div>
             <h3>Support Farmers</h3>
-            <p>
-              Your purchase helps support local farmers
-              and agriculture.
-            </p>
+            <p>Payment details and delivery notes go to the grower with the order.</p>
           </div>
-
         </div>
-
+        <Link to="/about" className="text-link">Read more about AgriMart</Link>
       </section>
 
+      <section className="home-about-section">
+        <div>
+          <p className="small-title">ABOUT AGRIMART</p>
+          <h2>A shorter journey from the field to your table</h2>
+        </div>
+        <div>
+          <p>
+            AgriMart helps growers list what they harvest and make, while
+            customers discover products by category and order directly.
+            Clear listings and farmer-managed stock make buying and selling
+            easier to follow.
+          </p>
+          <Link to="/about" className="text-link">Our story and how it works →</Link>
+        </div>
+      </section>
 
-      {/* Footer */}
-      <footer className="footer" id="contact">
+      <section className="contact-section">
+        <div>
+          <h2>Contact</h2>
+          <p className="section-description">
+            Questions about selling or buying stay on this device until a
+            mail service is connected.
+          </p>
+          <p>Messages are saved in this browser. No support mailbox is connected yet.</p>
+        </div>
+        <ContactForm />
+      </section>
 
-        <h2>🌾 AgriMart</h2>
-
-        <p>
-          Connecting Farmers with Customers
-        </p>
-
-        <p className="copyright">
-          © 2026 AgriMart. All Rights Reserved.
-        </p>
-
-      </footer>
-
+      <Footer />
     </div>
   );
 }
